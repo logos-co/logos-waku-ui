@@ -88,10 +88,10 @@ endif()
 
 # Source files
 set(SOURCES
-    WakuUIComponent.cpp
-    WakuUIComponent.h
-    src/WakuWidget.cpp
-    src/WakuWidget.h
+    plugin/WakuUIComponent.cpp
+    plugin/WakuUIComponent.h
+    plugin/WakuWidget.cpp
+    plugin/WakuWidget.h
 )
 
 # Add SDK sources (only if source layout, installed layout uses the library)

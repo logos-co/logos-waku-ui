@@ -1,5 +1,5 @@
 #include "WakuUIComponent.h"
-#include "src/WakuWidget.h"
+#include "WakuWidget.h"
 
 QWidget* WakuUIComponent::createWidget(LogosAPI* logosAPI) {
     // LogosAPI parameter available but not used - WakuWidget creates its own
