@@ -1,0 +1,22 @@
+{
+  "name": "waku_ui",
+  "version": "1.0.0",
+  "description": "Waku module interface for the Logos application",
+  "author": "Logos Core Team",
+  "type": "ui",
+  "main": "waku_ui",
+  "dependencies": ["waku_module"],
+  "category": "waku",
+  "build": {
+    "type": "cmake",
+    "files": [
+      "src/waku_ui_plugin.cpp",
+      "src/waku_ui_plugin.h",
+      "src/waku_ui_resources.qrc"
+    ]
+  },
+  "capabilities": [
+    "ui_components",
+    "networking"
+  ]
+} 
