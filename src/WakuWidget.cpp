@@ -5,6 +5,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QMetaType>
 #include "logos_api_client.h"
 
 WakuWidget::WakuWidget(QWidget* parent) 
@@ -89,56 +90,26 @@ WakuWidget::~WakuWidget() {
 
 void WakuWidget::startWaku() {
     updateStatus("Status: Starting Waku...");
+
+    auto& wakuModule = logos->waku_module;
+
+    // TODO: Add connections to various signals from waku module here
     
-    // Subscribe to waku events if available
-    if (logos && logos->waku_module.on) {
-        // Subscribe to peer events
-        logos->waku_module.on("peerConnected", [this](const QVariantList& data) {
-            qDebug() << "Peer connected event received";
-            refreshPeers();
-        });
-        
-        logos->waku_module.on("peerDisconnected", [this](const QVariantList& data) {
-            qDebug() << "Peer disconnected event received";
-            refreshPeers();
-        });
-    }
-    
-    // Try to start waku - method name may vary, common names: start, initialize, startNode
-    bool success = false;
-    if (logos && logos->waku_module.start) {
-        success = logos->waku_module.start();
-    } else if (logos && logos->waku_module.initialize) {
-        success = logos->waku_module.initialize();
-    } else if (logos && logos->waku_module.startNode) {
-        success = logos->waku_module.startNode();
-    } else {
-        // Try generic invoke
-        QVariant result = m_logosAPI->getClient("waku_module")->invokeRemoteMethod("waku_module", "start");
-        success = result.toBool();
-    }
-    
-    if (!success) {
-        updateStatus("Error: Failed to start Waku");
-        QMessageBox::warning(this, "Waku Error", "Failed to start Waku module. Check if waku_module plugin is loaded.");
-        return;
-    }
-    
+    // TODO: call start method on waku module
+    // bool _start = wakuModule->start();
+    //if (!success) {
+    //    updateStatus("Error: Failed to start waku module");
+    //    return;
+    //}
+
     isWakuRunning = true;
-    updateStatus("Status: Waku running");
-    
+    updateStatus("Status: Waku started");
+
     // Enable UI components
     startButton->setEnabled(false);
     stopButton->setEnabled(true);
     refreshPeersButton->setEnabled(true);
     refreshMetricsButton->setEnabled(true);
-    
-    // Start auto-refreshing metrics every 5 seconds
-    metricsTimer->start(5000);
-    
-    // Initial refresh
-    refreshPeers();
-    refreshMetrics();
 }
 
 void WakuWidget::stopWaku() {
@@ -148,22 +119,12 @@ void WakuWidget::stopWaku() {
     
     updateStatus("Status: Stopping Waku...");
     
-    // Stop metrics timer
-    if (metricsTimer) {
-        metricsTimer->stop();
-    }
-    
-    // Try to stop waku
-    if (logos && logos->waku_module.stop) {
-        logos->waku_module.stop();
-    } else if (logos && logos->waku_module.shutdown) {
-        logos->waku_module.shutdown();
-    } else if (logos && logos->waku_module.stopNode) {
-        logos->waku_module.stopNode();
-    } else {
-        // Try generic invoke
-        m_logosAPI->getClient("waku_module")->invokeRemoteMethod("waku_module", "stop");
-    }
+    // TODO: Try to stop waku
+    // bool stop = wakuModule->stop();
+    //if (!success) {
+    //    updateStatus("Error: Failed to stop waku module");
+    //    return;
+    //}
     
     isWakuRunning = false;
     updateStatus("Status: Waku stopped");
@@ -186,26 +147,26 @@ void WakuWidget::refreshPeers() {
     
     // Try to get peers - method name may vary: getPeers, peers, listPeers
     QVariant result;
-    if (logos && logos->waku_module.getPeers) {
-        result = logos->waku_module.getPeers();
-    } else if (logos && logos->waku_module.peers) {
-        result = logos->waku_module.peers();
-    } else if (logos && logos->waku_module.listPeers) {
-        result = logos->waku_module.listPeers();
-    } else {
+    // if (logos && logos->waku_module.getPeers) {
+    //     result = logos->waku_module.getPeers();
+    // } else if (logos && logos->waku_module.peers) {
+    //     result = logos->waku_module.peers();
+    // } else if (logos && logos->waku_module.listPeers) {
+    //     result = logos->waku_module.listPeers();
+    // } else {
         // Try generic invoke
         result = m_logosAPI->getClient("waku_module")->invokeRemoteMethod("waku_module", "getPeers");
-    }
+    // }
     
     QStringList peers;
-    if (result.type() == QVariant::StringList) {
+    if (result.typeId() == QMetaType::QStringList) {
         peers = result.toStringList();
-    } else if (result.type() == QVariant::List) {
+    } else if (result.typeId() == QMetaType::QVariantList) {
         QVariantList list = result.toList();
         for (const QVariant& item : list) {
             peers.append(item.toString());
         }
-    } else if (result.type() == QVariant::String) {
+    } else if (result.typeId() == QMetaType::QString) {
         // Try to parse as JSON
         QJsonParseError error;
         QJsonDocument doc = QJsonDocument::fromJson(result.toString().toUtf8(), &error);
@@ -227,21 +188,21 @@ void WakuWidget::refreshMetrics() {
     
     // Try to get metrics - method name may vary: getMetrics, metrics, getStats
     QVariant result;
-    if (logos && logos->waku_module.getMetrics) {
-        result = logos->waku_module.getMetrics();
-    } else if (logos && logos->waku_module.metrics) {
-        result = logos->waku_module.metrics();
-    } else if (logos && logos->waku_module.getStats) {
-        result = logos->waku_module.getStats();
-    } else {
+    // if (logos && logos->waku_module.getMetrics) {
+    //     result = logos->waku_module.getMetrics();
+    // } else if (logos && logos->waku_module.metrics) {
+    //     result = logos->waku_module.metrics();
+    // } else if (logos && logos->waku_module.getStats) {
+    //     result = logos->waku_module.getStats();
+    // } else {
         // Try generic invoke
         result = m_logosAPI->getClient("waku_module")->invokeRemoteMethod("waku_module", "getMetrics");
-    }
+    // }
     
     QString metricsText;
-    if (result.type() == QVariant::String) {
+    if (result.typeId() == QMetaType::QString) {
         metricsText = result.toString();
-    } else if (result.type() == QVariant::Map) {
+    } else if (result.typeId() == QMetaType::QVariantMap) {
         QVariantMap map = result.toMap();
         QJsonObject obj = QJsonObject::fromVariantMap(map);
         QJsonDocument doc(obj);

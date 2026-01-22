@@ -1,4 +1,4 @@
-# logos-chat-ui
+# logos-waku-ui
 
 ## How to Build
 
@@ -15,7 +15,7 @@ nix build '.#default'
 ```
 
 The result will include:
-- `/lib/chat_ui.dylib` (or `.so` on Linux) - The Chat UI plugin
+- `/lib/waku_ui.dylib` (or `.so` on Linux) - The Waku UI plugin
 
 #### Build Individual Components
 
@@ -50,10 +50,10 @@ After building the app with `nix build '.#app'`, you can run it:
 
 ```bash
 # Run the standalone Qt application
-./result/bin/logos-chat-ui-app
+./result/bin/logos-waku-ui-app
 ```
 
-The app will automatically load the required modules (capability_module, waku_module, chat) and the chat_ui Qt plugin. All dependencies are bundled in the Nix store layout.
+The app will automatically load the required modules (capability_module, waku_module) and the waku_ui Qt plugin. All dependencies are bundled in the Nix store layout.
 
 #### Nix Organization
 
@@ -66,18 +66,18 @@ The nix build system is organized into modular files in the `/nix` directory:
 
 When built with Nix:
 
-**Library build (`nix build '.#logos-chat-ui-lib'`):**
+**Library build (`nix build '.#lib'`):**
 ```
 result/
 └── lib/
-    └── chat_ui.dylib    # Logos Chat UI plugin
+    └── waku_ui.dylib    # Logos Waku UI plugin
 ```
 
 **App build (`nix build '.#app'`):**
 ```
 result/
 ├── bin/
-│   ├── logos-chat-ui-app    # Standalone Qt application
+│   ├── logos-waku-ui-app    # Standalone Qt application
 │   ├── logos_host           # Logos host executable (for plugins)
 │   └── logoscore            # Logos core executable
 ├── lib/
@@ -86,9 +86,8 @@ result/
 ├── modules/
 │   ├── capability_module_plugin.dylib
 │   ├── waku_module_plugin.dylib
-│   ├── chat_plugin.dylib
 │   └── libwaku.dylib
-└── chat_ui.dylib            # Qt plugin (loaded by app)
+└── waku_ui.dylib            # Qt plugin (loaded by app)
 ```
 
 ## Requirements
@@ -105,7 +104,6 @@ result/
 - logos-liblogos
 - logos-cpp-sdk (for header generation)
 - logos-waku-module
-- logos-chat-module
 - logos-capability-module
 - zstd
 - krb5
