@@ -7,6 +7,7 @@
 #include <QTextEdit>
 #include <QLabel>
 #include <QListWidget>
+#include <QListWidgetItem>
 #include <QTimer>
 #include <string>
 #include "logos_api.h"
@@ -32,6 +33,8 @@ private slots:
     void onRefreshPeersClicked();
     void onRefreshMetricsClicked();
     void onMetricsTimer();
+    void onConnectedPeersResponse(const QVariantList& data);
+    void onMetricsResponse(const QVariantList& data);
 
 private:
     // UI elements
@@ -62,6 +65,6 @@ private:
     
     // Helper methods
     void updateStatus(const QString& message);
-    void updatePeersList(const QStringList& peers);
+    void updatePeersList(const QStringList& peers, const QString& timestamp = QString());
     void updateMetrics(const QString& metrics);
 };
