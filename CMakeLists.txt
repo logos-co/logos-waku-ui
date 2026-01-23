@@ -68,7 +68,7 @@ if(NOT _cpp_sdk_found)
 endif()
 
 # Find Qt packages
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets RemoteObjects)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets RemoteObjects Quick QuickWidgets)
 
 # Get the real path to handle symlinks correctly
 get_filename_component(REAL_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" REALPATH)
@@ -88,10 +88,11 @@ endif()
 
 # Source files
 set(SOURCES
-    plugin/WakuUIComponent.cpp
-    plugin/WakuUIComponent.h
-    plugin/WakuWidget.cpp
-    plugin/WakuWidget.h
+    plugin/WakuPlugin.cpp
+    plugin/WakuPlugin.h
+    plugin/src/WakuBackend.cpp
+    plugin/src/WakuBackend.h
+    plugin/waku_resources.qrc
 )
 
 # Add SDK sources (only if source layout, installed layout uses the library)
@@ -205,6 +206,8 @@ target_link_libraries(waku_ui PRIVATE
     Qt6::Core
     Qt6::Widgets
     Qt6::RemoteObjects
+    Qt6::Quick
+    Qt6::QuickWidgets
     component-interfaces
 )
 

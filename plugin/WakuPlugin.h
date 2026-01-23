@@ -3,7 +3,7 @@
 #include <IComponent.h>
 #include <QObject>
 
-class WakuUIComponent : public QObject, public IComponent {
+class WakuPlugin : public QObject, public IComponent {
     Q_OBJECT
     Q_INTERFACES(IComponent)
     Q_PLUGIN_METADATA(IID IComponent_iid FILE "metadata.json")
