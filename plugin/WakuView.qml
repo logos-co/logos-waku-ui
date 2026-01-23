@@ -21,8 +21,14 @@ Rectangle {
         readonly property color buttonColor: "#4d4d4d"
         readonly property color hoverColor: "#3d3d3d"
         
+        // Status Colors
+        readonly property color statusSuccessColor: "#4ade80"  // Green for Running
+        readonly property color statusErrorColor: "#ef4444"    // Red for Error
+        readonly property color statusWarningColor: "#fbbf24"  // Amber for Starting/Stopping
+        readonly property color statusNeutralColor: "#9ca3af"  // Gray for NotStarted/Stopped
+        
         // Dimensions
-        readonly property int primaryFontSize: 12
+        readonly property int primaryFontSize: 14
         
         function getStatusString(status) {
             switch(status) {
@@ -33,6 +39,18 @@ Rectangle {
                 case WakuBackend.Stopped: return "Waku stopped";
                 case WakuBackend.Error: return "Error";
                 default: return "Unknown";
+            }
+        }
+        
+        function getStatusColor(status) {
+            switch(status) {
+                case WakuBackend.Running: return statusSuccessColor;
+                case WakuBackend.Error: return statusErrorColor;
+                case WakuBackend.Starting: return statusWarningColor;
+                case WakuBackend.Stopping: return statusWarningColor;
+                case WakuBackend.NotStarted: return statusNeutralColor;
+                case WakuBackend.Stopped: return statusNeutralColor;
+                default: return textSecondaryColor;
             }
         }
     }
@@ -50,8 +68,7 @@ Rectangle {
             Button {
                 text: "Start Waku"
                 enabled: backend.status === WakuBackend.NotStarted || backend.status === WakuBackend.Stopped || backend.status === WakuBackend.Error
-                font.family: "Courier"
-                font.pointSize: _d.primaryFontSize
+                font.pixelSize: _d.primaryFontSize
                 Layout.preferredWidth: 140
                 onClicked: backend.startWaku()
                 
@@ -76,8 +93,7 @@ Rectangle {
             Button {
                 text: "Stop Waku"
                 enabled: backend.status === WakuBackend.Running
-                font.family: "Courier"
-                font.pointSize: _d.primaryFontSize
+                font.pixelSize: _d.primaryFontSize
                 Layout.preferredWidth: 140
                 onClicked: backend.stopWaku()
                 
@@ -102,8 +118,7 @@ Rectangle {
             Button {
                 text: "Refresh Peers"
                 enabled: backend.status === WakuBackend.Running
-                font.family: "Courier"
-                font.pointSize: _d.primaryFontSize
+                font.pixelSize: _d.primaryFontSize
                 Layout.preferredWidth: 140
                 onClicked: backend.refreshPeers()
                 
@@ -128,8 +143,7 @@ Rectangle {
             Button {
                 text: "Refresh Metrics"
                 enabled: backend.status === WakuBackend.Running
-                font.family: "Courier"
-                font.pointSize: _d.primaryFontSize
+                font.pixelSize: _d.primaryFontSize
                 Layout.preferredWidth: 140
                 onClicked: backend.refreshMetrics()
                 
@@ -156,32 +170,53 @@ Rectangle {
             }
         }
 
-                // Status label
+        // Status section
+        Text {
+            text: "Status:"
+            font.pixelSize: _d.primaryFontSize
+            color: _d.textColor
+        }
+
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 36
-            border.color: _d.borderColor
-            border.width: 1
+            Layout.preferredHeight: 40
             color: _d.surfaceColor
             radius: 4
+            border.color: _d.borderColor
+            border.width: 1
 
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.leftMargin: 5
-                text: "Status: " + _d.getStatusString(backend.status)
-                font.family: "Courier"
-                font.pointSize: _d.primaryFontSize
-                color: _d.textColor
+                anchors.leftMargin: 12
+                text: _d.getStatusString(backend.status)
+                font.pixelSize: _d.primaryFontSize
+                font.bold: true
+                color: _d.getStatusColor(backend.status)
             }
         }
 
         // Connected Peers section
-        Text {
-            text: "Connected Peers: " + backend.peersList.length
-            font.family: "Courier"
-            font.pointSize: _d.fontSize
-            color: _d.textColor
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 8
+            
+            Text {
+                text: "Connected Peers: " + backend.peersList.length
+                font.pixelSize: _d.primaryFontSize
+                color: _d.textColor
+                verticalAlignment: Text.AlignVCenter
+                Layout.alignment: Qt.AlignVCenter
+            }
+            
+            Text {
+                text: backend.peersLastUpdated ? "(Last updated: " + backend.peersLastUpdated + ")" : ""
+                font.pixelSize: 11
+                color: _d.textSecondaryColor
+                verticalAlignment: Text.AlignVCenter
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+            }
         }
 
         ScrollView {
@@ -210,11 +245,24 @@ Rectangle {
         }
 
         // Metrics section
-        Text {
-            text: "Metrics:"
-            font.family: "Courier"
-            font.pointSize: _d.fontSize
-            color: _d.textColor
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 8
+            
+            Text {
+                text: "Metrics:"
+                font.pixelSize: _d.primaryFontSize
+                color: _d.textColor
+                Layout.alignment: Qt.AlignVCenter
+            }
+            
+            Text {
+                text: backend.metricsLastUpdated ? "(Last updated: " + backend.metricsLastUpdated + ")" : ""
+                font.pixelSize: 11
+                color: _d.textSecondaryColor
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+            }
         }
 
         ScrollView {
@@ -231,12 +279,11 @@ Rectangle {
 
             TextArea {
                 id: metricsTextArea
-                anchors.fill: parent
-                anchors.margins: 8
+                Layout.fillWidth: true
+                Layout.fillHeight: true
                 readOnly: true
                 text: backend.metrics
-                font.family: "Courier"
-                font.pointSize: _d.primaryFontSize
+                font.pixelSize: _d.primaryFontSize
                 wrapMode: TextArea.Wrap
                 selectByMouse: true
                 color: _d.textColor

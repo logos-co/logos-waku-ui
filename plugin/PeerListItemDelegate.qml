@@ -16,7 +16,7 @@ ItemDelegate {
         readonly property color hoverColor: "#3d3d3d"
         
         // Dimensions
-        readonly property int primaryFontSize: 12
+        readonly property int primaryFontSize: 14
     }
     
     contentItem: RowLayout {
@@ -29,8 +29,7 @@ ItemDelegate {
         
         Text {
             text: (index + 1).toString() + "."
-            font.family: "Courier"
-            font.pointSize: _d.primaryFontSize
+            font.pixelSize: _d.primaryFontSize
             color: _d.textSecondaryColor
             Layout.preferredWidth: 30
             Layout.alignment: Qt.AlignTop | Qt.AlignLeft
@@ -38,8 +37,7 @@ ItemDelegate {
         
         Text {
             text: "Peer ID:"
-            font.family: "Courier"
-            font.pointSize: _d.primaryFontSize
+            font.pixelSize: _d.primaryFontSize
             font.bold: true
             color: _d.textSecondaryColor
             Layout.alignment: Qt.AlignTop
@@ -47,8 +45,7 @@ ItemDelegate {
         
         Text {
             text: modelData
-            font.family: "Courier"
-            font.pointSize: _d.primaryFontSize
+            font.pixelSize: _d.primaryFontSize
             color: _d.textColor
             wrapMode: Text.Wrap
             Layout.fillWidth: true

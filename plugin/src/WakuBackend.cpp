@@ -1,6 +1,7 @@
 #include "WakuBackend.h"
 #include <QDebug>
 #include <QDateTime>
+#include <QLocale>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -10,7 +11,9 @@ WakuBackend::WakuBackend(LogosAPI* logosAPI, QObject* parent)
       m_status(NotStarted),
       m_logosAPI(nullptr),
       m_logos(nullptr),
-      m_metricsTimer(nullptr)
+      m_metricsTimer(nullptr),
+      m_peersLastUpdated(""),
+      m_metricsLastUpdated("")
 {
     qDebug() << "Initializing WakuBackend...";
     
@@ -41,6 +44,12 @@ void WakuBackend::setStatus(WakuStatus newStatus)
         m_status = newStatus;
         emit statusChanged();
         qDebug() << "WakuBackend: Status changed to" << m_status;
+        
+        // Reset last updated times when stopped or not started
+        if (newStatus == NotStarted || newStatus == Stopped) {
+            setPeersLastUpdated("");
+            setMetricsLastUpdated("");
+        }
     }
 }
 
@@ -137,6 +146,8 @@ void WakuBackend::stopWaku()
     // Clear displays
     updatePeersList(QStringList());
     updateMetrics("");
+    setPeersLastUpdated("");
+    setMetricsLastUpdated("");
 }
 
 void WakuBackend::refreshPeers()
@@ -189,6 +200,44 @@ void WakuBackend::updateMetrics(const QString& metrics)
     }
 }
 
+void WakuBackend::setPeersLastUpdated(const QString& timestamp)
+{
+    if (m_peersLastUpdated != timestamp) {
+        m_peersLastUpdated = timestamp;
+        emit peersLastUpdatedChanged();
+    }
+}
+
+void WakuBackend::setMetricsLastUpdated(const QString& timestamp)
+{
+    if (m_metricsLastUpdated != timestamp) {
+        m_metricsLastUpdated = timestamp;
+        emit metricsLastUpdatedChanged();
+    }
+}
+
+QString WakuBackend::formatTimestamp(const QString& isoTimestamp)
+{
+    if (isoTimestamp.isEmpty()) {
+        return "";
+    }
+    
+    // Parse ISO 8601 format: "2026-01-23T19:53:46" or "2026-01-23T19:53:46.123Z"
+    QDateTime dateTime = QDateTime::fromString(isoTimestamp, Qt::ISODate);
+    if (!dateTime.isValid()) {
+        // Try alternative format
+        dateTime = QDateTime::fromString(isoTimestamp, "yyyy-MM-ddTHH:mm:ss");
+    }
+    
+    if (!dateTime.isValid()) {
+        // If parsing fails, return original
+        return isoTimestamp;
+    }
+    
+    // Format as "Jan 23, 2026 19:53:46"
+    return dateTime.toString("MMM d, yyyy HH:mm:ss");
+}
+
 void WakuBackend::onConnectedPeersResponse(const QVariantList& data)
 {
     if (data.isEmpty()) {
@@ -210,6 +259,13 @@ void WakuBackend::onConnectedPeersResponse(const QVariantList& data)
 
     // Update the peers list
     updatePeersList(peers);
+    
+    // Update timestamp if available
+    if (data.size() >= 2) {
+        QString isoTimestamp = data[1].toString();
+        QString formattedTimestamp = formatTimestamp(isoTimestamp);
+        setPeersLastUpdated(formattedTimestamp);
+    }
 }
 
 void WakuBackend::onMetricsResponse(const QVariantList& data)
@@ -240,4 +296,11 @@ void WakuBackend::onMetricsResponse(const QVariantList& data)
 
     // Update metrics
     updateMetrics(metricsText);
+    
+    // Update timestamp if available
+    if (data.size() >= 2) {
+        QString isoTimestamp = data[1].toString();
+        QString formattedTimestamp = formatTimestamp(isoTimestamp);
+        setMetricsLastUpdated(formattedTimestamp);
+    }
 }
