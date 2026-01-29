@@ -88,11 +88,11 @@ endif()
 
 # Source files
 set(SOURCES
-    plugin/WakuPlugin.cpp
-    plugin/WakuPlugin.h
-    plugin/src/WakuBackend.cpp
-    plugin/src/WakuBackend.h
-    plugin/waku_resources.qrc
+    src/WakuPlugin.cpp
+    src/WakuPlugin.h
+    src/WakuBackend.cpp
+    src/WakuBackend.h
+    src/waku_resources.qrc
 )
 
 # Add SDK sources (only if source layout, installed layout uses the library)
@@ -174,6 +174,7 @@ endif()
 # Include directories
 target_include_directories(waku_ui PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
     ${PLUGINS_OUTPUT_DIR}
 )

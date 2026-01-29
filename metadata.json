@@ -10,11 +10,11 @@
   "build": {
     "type": "cmake",
     "files": [
-      "plugin/WakuPlugin.cpp",
-      "plugin/WakuPlugin.h",
-      "plugin/src/WakuBackend.cpp",
-      "plugin/src/WakuBackend.h",
-      "plugin/waku_resources.qrc"
+      "src/WakuPlugin.cpp",
+      "src/WakuPlugin.h",
+      "src/WakuBackend.cpp",
+      "src/WakuBackend.h",
+      "src/waku_resources.qrc"
     ]
   },
   "capabilities": [

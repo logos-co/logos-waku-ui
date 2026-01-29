@@ -1,5 +1,5 @@
 #include "WakuPlugin.h"
-#include "src/WakuBackend.h"
+#include "WakuBackend.h"
 #include <QQuickWidget>
 #include <QQmlContext>
 #include <QQmlEngine>
@@ -13,16 +13,12 @@ QWidget* WakuPlugin::createWidget(LogosAPI* logosAPI) {
     QQuickWidget* quickWidget = new QQuickWidget();
     quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
-    // Register WakuBackend type with QML engine to expose the enum
     qmlRegisterType<WakuBackend>("WakuBackend", 1, 0, "WakuBackend");
 
-    // Create backend instance
     WakuBackend* backend = new WakuBackend(logosAPI, quickWidget);
     
-    // Set backend as context property
     quickWidget->rootContext()->setContextProperty("backend", backend);
 
-    // For development: check environment variable, otherwise use qrc
     QString qmlPath = "qrc:/WakuView.qml";
     QString envPath = qgetenv("WAKU_UI_QML_PATH");
     if (!envPath.isEmpty() && QFile::exists(envPath)) {

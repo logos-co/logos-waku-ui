@@ -8,14 +8,12 @@ ItemDelegate {
     QtObject {
         id: _d
         
-        // Colors
         readonly property color textColor: "#ffffff"
         readonly property color textSecondaryColor: "#a0a0a0"
         readonly property color surfaceColor: "#2d2d2d"
         readonly property color surfaceDarkColor: "#252525"
         readonly property color hoverColor: "#3d3d3d"
         
-        // Dimensions
         readonly property int primaryFontSize: 14
     }
     

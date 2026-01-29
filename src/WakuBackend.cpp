@@ -45,7 +45,6 @@ void WakuBackend::setStatus(WakuStatus newStatus)
         emit statusChanged();
         qDebug() << "WakuBackend: Status changed to" << m_status;
         
-        // Reset last updated times when stopped or not started
         if (newStatus == NotStarted || newStatus == Stopped) {
             setPeersLastUpdated("");
             setMetricsLastUpdated("");
@@ -89,7 +88,6 @@ void WakuBackend::startWaku()
         return;
     }
 
-    // Subscribe to connectedPeersResponse events
     if (!wakuModule.on("connectedPeersResponse", [this](const QVariantList& data) {
             if (data.size() < 1) {
                 qWarning() << "WakuBackend: connectedPeersResponse payload missing fields";
@@ -100,7 +98,6 @@ void WakuBackend::startWaku()
         qWarning() << "WakuBackend: failed to subscribe to connectedPeersResponse events";
     }
 
-    // Subscribe to metricsResponse events
     if (!wakuModule.on("metricsResponse", [this](const QVariantList& data) {
             if (data.size() < 1) {
                 qWarning() << "WakuBackend: metricsResponse payload missing fields";
@@ -118,7 +115,6 @@ void WakuBackend::startWaku()
 
     setStatus(Running);
 
-    // Refresh peers and metrics after a delay to allow Waku to fully start
     QTimer::singleShot(1000, this, [this]() {
         refreshPeers();
         refreshMetrics();
@@ -162,8 +158,6 @@ void WakuBackend::refreshPeers()
         qWarning() << "WakuBackend: Failed to get connected peers";
         return;
     }
-
-    // The peers will be received via the onConnectedPeersResponse event handler
 }
 
 void WakuBackend::refreshMetrics()
@@ -178,8 +172,6 @@ void WakuBackend::refreshMetrics()
         qWarning() << "WakuBackend: Failed to get metrics";
         return;
     }
-
-    // The metrics will be received via the onMetricsResponse event handler
 }
 
 void WakuBackend::updatePeersList(const QStringList& peers)
@@ -222,15 +214,12 @@ QString WakuBackend::formatTimestamp(const QString& isoTimestamp)
         return "";
     }
     
-    // Parse ISO 8601 format: "2026-01-23T19:53:46" or "2026-01-23T19:53:46.123Z"
     QDateTime dateTime = QDateTime::fromString(isoTimestamp, Qt::ISODate);
     if (!dateTime.isValid()) {
-        // Try alternative format
         dateTime = QDateTime::fromString(isoTimestamp, "yyyy-MM-ddTHH:mm:ss");
     }
     
     if (!dateTime.isValid()) {
-        // If parsing fails, return original
         return isoTimestamp;
     }
     
@@ -248,7 +237,6 @@ void WakuBackend::onConnectedPeersResponse(const QVariantList& data)
     qDebug() << "WakuBackend::onConnectedPeersResponse: Data size:" << data.size();
     qDebug() << "WakuBackend::onConnectedPeersResponse: Data:" << data;
 
-    // The first element is a comma-separated string of peer IDs
     QString peersString = data[0].toString();
 
     // Parse comma-separated peer IDs
@@ -257,10 +245,8 @@ void WakuBackend::onConnectedPeersResponse(const QVariantList& data)
         peer = peer.trimmed();
     }
 
-    // Update the peers list
     updatePeersList(peers);
     
-    // Update timestamp if available
     if (data.size() >= 2) {
         QString isoTimestamp = data[1].toString();
         QString formattedTimestamp = formatTimestamp(isoTimestamp);
@@ -275,13 +261,11 @@ void WakuBackend::onMetricsResponse(const QVariantList& data)
         return;
     }
 
-    qDebug() << "WakuBackend::onMetricsResponse: Data size:" << data.size();
-    qDebug() << "WakuBackend::onMetricsResponse: Data:" << data;
+    qDebug() << "WakuBackend::onMetricsResponse: Data size:" << data << " size " << data.size();
 
     // The first element is the metrics JSON string
     QString metricsJson = data[0].toString();
 
-    // Try to parse and format the JSON if it's valid JSON
     QString metricsText;
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(metricsJson.toUtf8(), &error);
@@ -294,7 +278,17 @@ void WakuBackend::onMetricsResponse(const QVariantList& data)
         metricsText = metricsJson;
     }
 
-    // Update metrics
+    // Filter out comment lines (lines starting with #)
+    QStringList lines = metricsText.split('\n');
+    QStringList filteredLines;
+    for (const QString& line : lines) {
+        QString trimmedLine = line.trimmed();
+        if (!trimmedLine.startsWith('#')) {
+            filteredLines.append(line);
+        }
+    }
+    metricsText = filteredLines.join('\n');
+
     updateMetrics(metricsText);
     
     // Update timestamp if available

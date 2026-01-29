@@ -29,7 +29,6 @@ void MainWindow::setupUi()
         pluginExtension = ".so";
     #endif
 
-    // Load the waku_ui plugin with the appropriate extension
     QString pluginPath = QCoreApplication::applicationDirPath() + "/../waku_ui" + pluginExtension;
     QPluginLoader loader(pluginPath);
 

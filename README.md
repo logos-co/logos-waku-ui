@@ -108,3 +108,10 @@ result/
 - zstd
 - krb5
 - abseil-cpp
+
+### QML Hot Reload
+During development, you can enable QML hot reload by setting an environment variable:
+```bash
+export CHAT_UI_QML_PATH=/path/to/logos-chat-ui/src/ChatView.qml
+```
+This allows you to edit the QML file and see changes by reloading the plugin without recompiling.

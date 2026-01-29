@@ -10,7 +10,6 @@ Rectangle {
     QtObject {
         id: _d
         
-        // Colors
         readonly property color backgroundColor: "#1e1e1e"
         readonly property color surfaceColor: "#2d2d2d"
         readonly property color surfaceDarkColor: "#252525"
@@ -21,13 +20,11 @@ Rectangle {
         readonly property color buttonColor: "#4d4d4d"
         readonly property color hoverColor: "#3d3d3d"
         
-        // Status Colors
         readonly property color statusSuccessColor: "#4ade80"  // Green for Running
         readonly property color statusErrorColor: "#ef4444"    // Red for Error
         readonly property color statusWarningColor: "#fbbf24"  // Amber for Starting/Stopping
         readonly property color statusNeutralColor: "#9ca3af"  // Gray for NotStarted/Stopped
         
-        // Dimensions
         readonly property int primaryFontSize: 14
         
         function getStatusString(status) {
@@ -60,7 +57,6 @@ Rectangle {
         anchors.margins: 20
         spacing: 10
 
-        // Button row
         RowLayout {
             Layout.fillWidth: true
             spacing: 10
@@ -170,7 +166,6 @@ Rectangle {
             }
         }
 
-        // Status section
         Text {
             text: "Status:"
             font.pixelSize: _d.primaryFontSize
@@ -196,7 +191,6 @@ Rectangle {
             }
         }
 
-        // Connected Peers section
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
@@ -244,7 +238,6 @@ Rectangle {
             }
         }
 
-        // Metrics section
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
